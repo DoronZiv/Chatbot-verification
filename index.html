@@ -4,22 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voiceflow Image Upload Test</title>
-    <!-- Add base URL for GitHub Pages -->
-    <base href="/Chatbot-verification/">
+    <!-- Remove base tag as it might cause issues -->
 </head>
 <body>
     <!-- Main content -->
     <h1>Voiceflow Image Upload Test</h1>
     <p>Interact with the chat widget to test image uploading.</p>
 
-    <!-- Load the extensions file with absolute path -->
+    <!-- Load the extensions file with relative path -->
     <script type="module">
-        // Use absolute path for import
-        import { ImageUploadExtension } from '/Chatbot-verification/extensions.js';
+        // Use relative path for import
+        import { ImageUploadExtension } from './extensions.js';
         
-        // Register extension when Voiceflow is ready
-        window.addEventListener('voiceflow:ready', function() {
-            window.voiceflow.chat.addExtension(ImageUploadExtension);
+        // Wait for both module load and Voiceflow ready
+        window.addEventListener('load', function() {
+            if (window.voiceflow && window.voiceflow.chat) {
+                window.voiceflow.chat.addExtension(ImageUploadExtension);
+                console.log('Extension added on load');
+            } else {
+                window.addEventListener('voiceflow:ready', function() {
+                    window.voiceflow.chat.addExtension(ImageUploadExtension);
+                    console.log('Extension added on voiceflow:ready');
+                });
+            }
         });
     </script>
 
@@ -33,6 +40,7 @@
                     url: 'https://general-runtime.voiceflow.com',
                     versionID: 'production'
                 });
+                console.log('Voiceflow chat widget loaded');
             }
             v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; 
             v.type = "text/javascript"; 

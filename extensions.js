@@ -2,13 +2,21 @@ export const ImageUploadExtension = {
   name: 'ImageUpload',
   type: 'response',
   match: ({ trace }) => {
-    console.log('Checking match for trace:', trace);
-    // Check both possible trace formats
+    console.log('Trace received in match:', {
+      type: trace.type,
+      payload: trace.payload,
+      full: trace
+    });
+    
+    // More specific matching logic
     const isMatch = 
       trace.type === 'ext_image_upload' || 
       trace.type === 'component' ||
-      (trace.payload && trace.payload.name === 'ext_image_upload');
-    console.log('Is match?', isMatch);
+      (trace.payload && 
+       (trace.payload.name === 'ext_image_upload' || 
+        trace.payload.type === 'ext_image_upload'));
+    
+    console.log('Match result:', isMatch);
     return isMatch;
   },
   render: ({ trace, element }) => {
