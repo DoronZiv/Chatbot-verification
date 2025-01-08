@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voiceflow Image Upload Test</title>
+</head>
+<body>
+    <!-- Main content -->
+    <h1>Voiceflow Image Upload Test</h1>
+    <p>Interact with the chat widget to test image uploading.</p>
+
+    <!-- Load the extensions file -->
+    <script type="module">
+        import { ImageUploadExtension } from './extensions.js';
+        
+        // Register extension when Voiceflow is ready
+        window.addEventListener('voiceflow:ready', function() {
+            window.voiceflow.chat.addExtension(ImageUploadExtension);
+        });
+    </script>
+
+    <!-- Voiceflow Chat Widget -->
+    <script type="text/javascript">
+        (function(d, t) {
+            var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+            v.onload = function() {
+                window.voiceflow.chat.load({
+                    verify: { projectID: '674ffbb4f8ed29bcbd9e2182' },
+                    url: 'https://general-runtime.voiceflow.com',
+                    versionID: 'production'
+                });
+            }
+            v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; 
+            v.type = "text/javascript"; 
+            s.parentNode.insertBefore(v, s);
+        })(document, 'script');
+    </script>
+</body>
+</html> 
