@@ -4,15 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voiceflow Image Upload Test</title>
+    <!-- Add base URL for GitHub Pages -->
+    <base href="/Chatbot-verification/">
 </head>
 <body>
     <!-- Main content -->
     <h1>Voiceflow Image Upload Test</h1>
     <p>Interact with the chat widget to test image uploading.</p>
 
-    <!-- Load the extensions file -->
+    <!-- Load the extensions file with absolute path -->
     <script type="module">
-        import { ImageUploadExtension } from './extensions.js';
+        // Use absolute path for import
+        import { ImageUploadExtension } from '/Chatbot-verification/extensions.js';
         
         // Register extension when Voiceflow is ready
         window.addEventListener('voiceflow:ready', function() {

@@ -1,9 +1,18 @@
 export const ImageUploadExtension = {
   name: 'ImageUpload',
   type: 'response',
-  match: ({ trace }) =>
-    trace.type === 'ext_image_upload' || trace.payload.name === 'ext_image_upload',
+  match: ({ trace }) => {
+    console.log('Checking match for trace:', trace);
+    // Check both possible trace formats
+    const isMatch = 
+      trace.type === 'ext_image_upload' || 
+      trace.type === 'component' ||
+      (trace.payload && trace.payload.name === 'ext_image_upload');
+    console.log('Is match?', isMatch);
+    return isMatch;
+  },
   render: ({ trace, element }) => {
+    console.log('Rendering image upload component');
     const uploadContainer = document.createElement('div');
     
     uploadContainer.innerHTML = `
@@ -11,6 +20,9 @@ export const ImageUploadExtension = {
         .image-upload-container {
           padding: 10px;
           text-align: center;
+          border: 2px dashed #2e6ee1;
+          border-radius: 8px;
+          margin: 10px 0;
         }
         
         .upload-input {
@@ -25,6 +37,7 @@ export const ImageUploadExtension = {
           border-radius: 5px;
           cursor: pointer;
           margin-bottom: 10px;
+          font-weight: bold;
         }
         
         .preview-image {
@@ -38,12 +51,13 @@ export const ImageUploadExtension = {
           color: red;
           font-size: 12px;
           display: none;
+          margin-top: 5px;
         }
       </style>
       
       <div class="image-upload-container">
         <input type="file" class="upload-input" accept="image/*">
-        <button class="upload-button">Upload Image</button>
+        <button class="upload-button">📸 Upload Image</button>
         <img class="preview-image">
         <div class="error-message"></div>
       </div>
@@ -58,13 +72,21 @@ export const ImageUploadExtension = {
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
     uploadButton.addEventListener('click', () => {
+      console.log('Upload button clicked');
       fileInput.click();
     });
 
     fileInput.addEventListener('change', (event) => {
+      console.log('File selected');
       const file = event.target.files[0];
       
       if (!file) return;
+
+      console.log('File details:', {
+        name: file.name,
+        type: file.type,
+        size: file.size
+      });
 
       // Validate file type
       if (!file.type.startsWith('image/')) {
@@ -86,29 +108,53 @@ export const ImageUploadExtension = {
       // Show preview
       const reader = new FileReader();
       reader.onload = (e) => {
+        console.log('File loaded successfully');
         previewImage.src = e.target.result;
         previewImage.style.display = 'block';
         
         // Send image data to Voiceflow
-        window.voiceflow.chat.interact({
-          type: 'complete',
-          payload: {
-            fileName: file.name,
-            fileType: file.type,
-            fileSize: file.size,
-            imageData: e.target.result // base64 encoded image
-          },
-        });
+        try {
+          window.voiceflow.chat.interact({
+            type: 'complete',
+            payload: {
+              fileName: file.name,
+              fileType: file.type,
+              fileSize: file.size,
+              imageData: e.target.result // base64 encoded image
+            },
+          });
+          console.log('Image data sent to Voiceflow');
+        } catch (error) {
+          console.error('Error sending image to Voiceflow:', error);
+          errorMessage.textContent = 'Error uploading image';
+          errorMessage.style.display = 'block';
+        }
+      };
+      
+      reader.onerror = (error) => {
+        console.error('Error reading file:', error);
+        errorMessage.textContent = 'Error reading file';
+        errorMessage.style.display = 'block';
       };
       
       reader.readAsDataURL(file);
     });
 
+    console.log('Appending upload container to element');
     element.appendChild(uploadContainer);
   },
 };
 
+// Debug logs for initialization
+console.log('Image Upload Extension loaded');
+
 // Register extension when Voiceflow is ready
 window.addEventListener('voiceflow:ready', function() {
-  window.voiceflow.chat.addExtension(ImageUploadExtension);
+  console.log('Voiceflow ready event triggered');
+  try {
+    window.voiceflow.chat.addExtension(ImageUploadExtension);
+    console.log('Extension added successfully');
+  } catch (error) {
+    console.error('Error adding extension:', error);
+  }
 }); 
