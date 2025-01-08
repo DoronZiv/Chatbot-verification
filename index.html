@@ -13,18 +13,24 @@
     <!-- Load the extensions file first -->
     <script type="module">
         import { ImageUploadExtension } from './extensions.js';
-        window.VFImageUploadExtension = ImageUploadExtension;
         
-        // Wait for Voiceflow to be ready
-        window.addEventListener('voiceflow:ready', function() {
-            console.log('Voiceflow ready, adding extension');
-            try {
-                window.voiceflow.chat.addExtension(window.VFImageUploadExtension);
-                console.log('Extension added successfully');
-            } catch (error) {
-                console.error('Error adding extension:', error);
+        // Function to register extension
+        function registerExtension() {
+            if (window.voiceflow && window.voiceflow.chat) {
+                try {
+                    window.voiceflow.chat.addExtension(ImageUploadExtension);
+                    console.log('Extension registered successfully');
+                } catch (error) {
+                    console.error('Failed to register extension:', error);
+                }
+            } else {
+                console.log('Waiting for Voiceflow to initialize...');
+                setTimeout(registerExtension, 500);
             }
-        });
+        }
+
+        // Start registration process after a short delay
+        setTimeout(registerExtension, 1000);
     </script>
 
     <!-- Voiceflow Chat Widget -->
