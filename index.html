@@ -10,6 +10,23 @@
     <h1>Voiceflow Image Upload Test</h1>
     <p>Interact with the chat widget to test image uploading.</p>
 
+    <!-- Load the extensions file first -->
+    <script type="module">
+        import { ImageUploadExtension } from './extensions.js';
+        window.VFImageUploadExtension = ImageUploadExtension;
+        
+        // Wait for Voiceflow to be ready
+        window.addEventListener('voiceflow:ready', function() {
+            console.log('Voiceflow ready, adding extension');
+            try {
+                window.voiceflow.chat.addExtension(window.VFImageUploadExtension);
+                console.log('Extension added successfully');
+            } catch (error) {
+                console.error('Error adding extension:', error);
+            }
+        });
+    </script>
+
     <!-- Voiceflow Chat Widget -->
     <script type="text/javascript">
         (function(d, t) {
@@ -25,30 +42,6 @@
             v.type = "text/javascript"; 
             s.parentNode.insertBefore(v, s);
         })(document, 'script');
-    </script>
-
-    <!-- Load the extensions file -->
-    <script type="module">
-        import { ImageUploadExtension } from './extensions.js';
-        
-        // Wait for Voiceflow to be fully loaded
-        const checkVoiceflow = setInterval(() => {
-            if (window.voiceflow && window.voiceflow.chat && typeof window.voiceflow.chat.addExtension === 'function') {
-                clearInterval(checkVoiceflow);
-                try {
-                    window.voiceflow.chat.addExtension(ImageUploadExtension);
-                    console.log('Extension added successfully');
-                } catch (error) {
-                    console.error('Error adding extension:', error);
-                }
-            }
-        }, 500);
-
-        // Timeout after 10 seconds
-        setTimeout(() => {
-            clearInterval(checkVoiceflow);
-            console.error('Timeout waiting for Voiceflow to load');
-        }, 10000);
     </script>
 </body>
 </html> 
