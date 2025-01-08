@@ -8,13 +8,11 @@ export const ImageUploadExtension = {
       full: trace
     });
     
-    // More specific matching logic
+    // Match custom component with specific type
     const isMatch = 
-      trace.type === 'ext_image_upload' || 
-      trace.type === 'component' ||
-      (trace.payload && 
-       (trace.payload.name === 'ext_image_upload' || 
-        trace.payload.type === 'ext_image_upload'));
+      (trace.type === 'component' && trace.payload?.component?.type === 'ext_image_upload') ||
+      (trace.type === 'ext_image_upload') ||
+      (trace.payload?.name === 'ext_image_upload');
     
     console.log('Match result:', isMatch);
     return isMatch;
@@ -120,15 +118,17 @@ export const ImageUploadExtension = {
         previewImage.src = e.target.result;
         previewImage.style.display = 'block';
         
-        // Send image data to Voiceflow
+        // Send image data to Voiceflow with specific payload structure
         try {
           window.voiceflow.chat.interact({
             type: 'complete',
             payload: {
-              fileName: file.name,
-              fileType: file.type,
-              fileSize: file.size,
-              imageData: e.target.result // base64 encoded image
+              data: {
+                name: file.name,
+                type: file.type,
+                size: file.size,
+                image: e.target.result // base64 encoded image
+              }
             },
           });
           console.log('Image data sent to Voiceflow');
