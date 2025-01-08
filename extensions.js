@@ -11,8 +11,8 @@ export const ImageUploadExtension = {
     // Match custom component with specific type
     const isMatch = 
       (trace.type === 'component' && trace.payload?.component?.type === 'ext_image_upload') ||
-      (trace.type === 'ext_image_upload') ||
-      (trace.payload?.name === 'ext_image_upload');
+      (trace.type === 'component' && trace.payload?.type === 'ext_image_upload') ||
+      (trace.type === 'ext_image_upload');
     
     console.log('Match result:', isMatch);
     return isMatch;
@@ -154,15 +154,4 @@ export const ImageUploadExtension = {
 };
 
 // Debug logs for initialization
-console.log('Image Upload Extension loaded');
-
-// Register extension when Voiceflow is ready
-window.addEventListener('voiceflow:ready', function() {
-  console.log('Voiceflow ready event triggered');
-  try {
-    window.voiceflow.chat.addExtension(ImageUploadExtension);
-    console.log('Extension added successfully');
-  } catch (error) {
-    console.error('Error adding extension:', error);
-  }
-}); 
+console.log('Image Upload Extension loaded'); 

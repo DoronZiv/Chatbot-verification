@@ -12,32 +12,33 @@
 
     <!-- Load the extensions file with relative path -->
     <script type="module">
-        // Use relative path for import
         import { ImageUploadExtension } from './extensions.js';
         
-        // Wait for both module load and Voiceflow ready
-        window.addEventListener('load', function() {
-            if (window.voiceflow && window.voiceflow.chat) {
+        // Function to add extension
+        function addExtension() {
+            try {
                 window.voiceflow.chat.addExtension(ImageUploadExtension);
-                console.log('Extension added on load');
-            } else {
-                window.addEventListener('voiceflow:ready', function() {
-                    window.voiceflow.chat.addExtension(ImageUploadExtension);
-                    console.log('Extension added on voiceflow:ready');
-                });
+                console.log('Extension added successfully');
+            } catch (error) {
+                console.error('Error adding extension:', error);
+                // Retry after a short delay if failed
+                setTimeout(addExtension, 1000);
             }
-        });
-    </script>
+        }
 
-    <!-- Voiceflow Chat Widget -->
-    <script type="text/javascript">
+        // Initialize Voiceflow chat with extension
         (function(d, t) {
             var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
             v.onload = function() {
                 window.voiceflow.chat.load({
                     verify: { projectID: '674ffbb4f8ed29bcbd9e2182' },
                     url: 'https://general-runtime.voiceflow.com',
-                    versionID: 'production'
+                    versionID: 'production',
+                    // Add load callback
+                    loaded: function() {
+                        console.log('Voiceflow chat loaded');
+                        addExtension();
+                    }
                 });
             }
             v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; 
