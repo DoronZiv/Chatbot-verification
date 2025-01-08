@@ -8,11 +8,12 @@ export const ImageUploadExtension = {
       full: trace
     });
     
-    // Match custom component with specific type
+    // Match any of these conditions
     const isMatch = 
-      (trace.type === 'component' && trace.payload?.component?.type === 'ext_image_upload') ||
-      (trace.type === 'component' && trace.payload?.type === 'ext_image_upload') ||
-      (trace.type === 'ext_image_upload');
+      trace.type === 'component' || 
+      trace.type === 'ext_image_upload' || 
+      (trace.payload?.component?.type === 'ext_image_upload') ||
+      (trace.payload?.type === 'ext_image_upload');
     
     console.log('Match result:', isMatch);
     return isMatch;

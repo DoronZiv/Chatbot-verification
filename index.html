@@ -10,41 +10,45 @@
     <h1>Voiceflow Image Upload Test</h1>
     <p>Interact with the chat widget to test image uploading.</p>
 
-    <!-- Load the extensions file with relative path -->
-    <script type="module">
-        import { ImageUploadExtension } from './extensions.js';
-        
-        // Function to add extension
-        function addExtension() {
-            try {
-                window.voiceflow.chat.addExtension(ImageUploadExtension);
-                console.log('Extension added successfully');
-            } catch (error) {
-                console.error('Error adding extension:', error);
-                // Retry after a short delay if failed
-                setTimeout(addExtension, 1000);
-            }
-        }
-
-        // Initialize Voiceflow chat with extension
+    <!-- Voiceflow Chat Widget -->
+    <script type="text/javascript">
         (function(d, t) {
             var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
             v.onload = function() {
                 window.voiceflow.chat.load({
                     verify: { projectID: '674ffbb4f8ed29bcbd9e2182' },
                     url: 'https://general-runtime.voiceflow.com',
-                    versionID: 'production',
-                    // Add load callback
-                    loaded: function() {
-                        console.log('Voiceflow chat loaded');
-                        addExtension();
-                    }
+                    versionID: 'production'
                 });
             }
             v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; 
             v.type = "text/javascript"; 
             s.parentNode.insertBefore(v, s);
         })(document, 'script');
+    </script>
+
+    <!-- Load the extensions file -->
+    <script type="module">
+        import { ImageUploadExtension } from './extensions.js';
+        
+        // Wait for Voiceflow to be fully loaded
+        const checkVoiceflow = setInterval(() => {
+            if (window.voiceflow && window.voiceflow.chat && typeof window.voiceflow.chat.addExtension === 'function') {
+                clearInterval(checkVoiceflow);
+                try {
+                    window.voiceflow.chat.addExtension(ImageUploadExtension);
+                    console.log('Extension added successfully');
+                } catch (error) {
+                    console.error('Error adding extension:', error);
+                }
+            }
+        }, 500);
+
+        // Timeout after 10 seconds
+        setTimeout(() => {
+            clearInterval(checkVoiceflow);
+            console.error('Timeout waiting for Voiceflow to load');
+        }, 10000);
     </script>
 </body>
 </html> 
