@@ -14,37 +14,21 @@
     <!-- Load the extensions file first -->
     <script type="module">
         import { ImageUploadExtension } from './extensions.js';
-        
-        // Function to register extension
-        function registerExtension() {
-            if (window.voiceflow && window.voiceflow.chat) {
-                try {
-                    window.voiceflow.chat.addExtension(ImageUploadExtension);
-                    console.log('Extension registered successfully');
-                } catch (error) {
-                    console.error('Failed to register extension:', error);
-                }
-            } else {
-                console.log('Waiting for Voiceflow to initialize...');
-                setTimeout(registerExtension, 500);
-            }
-        }
 
-        // Start registration process after a short delay
-        setTimeout(registerExtension, 1000);
-    </script>
-
-    <!-- Voiceflow Chat Widget -->
-    <script type="text/javascript">
         (function(d, t) {
             var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
             v.onload = function() {
                 window.voiceflow.chat.load({
                     verify: { projectID: '674ffbb4f8ed29bcbd9e2182' },
                     url: 'https://general-runtime.voiceflow.com',
-                    versionID: 'production'
+                    versionID: 'production',
+                    assistant: {
+                      extensions: [
+                        ImageUploadExtension,
+                      ],
+                    },
                 });
-            }
+            };
             v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; 
             v.type = "text/javascript"; 
             s.parentNode.insertBefore(v, s);
