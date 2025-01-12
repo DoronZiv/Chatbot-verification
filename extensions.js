@@ -14,7 +14,7 @@ export const ImageUploadExtension = {
           cursor: pointer;
         }
       </style>
-      <div class='my-file-upload'>Drag and drop a file here or click to upload</div>
+      <div class='my-file-upload'>העלאת קובץ כאן</div>
       <input type='file' style='display: none;'>
     `
 
