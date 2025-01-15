@@ -107,7 +107,77 @@ export const ImageUploadExtension = {
         console.error('שגיאה בהעלאת הקובץ ל-Google Drive:', error);
         throw error;
       }
-    }
+    },
   
-    // ... rest of the existing code remains the same ...
+    async loadGoogleAPI() {
+      return new Promise((resolve, reject) => {
+        gapi.load('client:auth2', async () => {
+          try {
+            // Generate random state string for security
+            const state = Math.random().toString(36).substring(7);
+            
+            const authConfig = {
+              clientId: process.env.GOOGLE_CLIENT_ID,
+              scope: 'https://www.googleapis.com/auth/drive.file',
+              redirect_uri: process.env.REDIRECT_URI,
+              response_type: 'code',
+              state: state,
+              auth_uri: 'https://auth-server.com/authorize'
+            };
+
+            // Handle authorization callback
+            if (window.location.pathname === '/callback') {
+              const urlParams = new URLSearchParams(window.location.search);
+              const code = urlParams.get('code');
+              const returnedState = urlParams.get('state');
+
+              // Verify state to prevent CSRF attacks
+              if (returnedState !== state) {
+                throw new Error('Invalid state parameter');
+              }
+
+              // Handle the authorization code
+              if (code) {
+                // Store the authorization code or exchange it for tokens
+                await this.handleAuthorizationCode(code);
+              }
+            }
+
+            await gapi.client.init(authConfig);
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        });
+      });
+    },
+  
+    async handleAuthorizationCode(code) {
+      // Handle the authorization code
+      // This is where you would typically exchange the code for access tokens
+      try {
+        const response = await fetch('/token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            code,
+            client_id: process.env.GOOGLE_CLIENT_ID,
+            redirect_uri: process.env.REDIRECT_URI,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to exchange authorization code');
+        }
+
+        const tokens = await response.json();
+        // Store tokens securely or handle as needed
+        return tokens;
+      } catch (error) {
+        console.error('Error exchanging authorization code:', error);
+        throw error;
+      }
+    }
   }
