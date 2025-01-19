@@ -35,9 +35,13 @@ export const ImageUploadExtension = {
         data.append('file', file)
 
         // Send file to Python backend
-        fetch('http://localhost:8080/upload', {
+        fetch('http://127.0.0.1:8080/upload', {
           method: 'POST',
-          body: data
+          body: data,
+          headers: {
+            'Accept': 'application/json',
+          },
+          credentials: 'include'  // This is needed for cookies/session
         })
         .then(response => response.json())
         .then(result => {
