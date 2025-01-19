@@ -35,13 +35,14 @@ export const ImageUploadExtension = {
         data.append('file', file)
 
         // Send file to Python backend
-        fetch('http://127.0.0.1:8080/upload', {
+        fetch('https://your-backend-domain.com/upload', {
           method: 'POST',
           body: data,
           headers: {
-            'Accept': 'application/json',
+            'Accept': 'application/json'
           },
-          credentials: 'include'  // This is needed for cookies/session
+          mode: 'cors',  // Explicitly set CORS mode
+          credentials: 'include'
         })
         .then(response => response.json())
         .then(result => {

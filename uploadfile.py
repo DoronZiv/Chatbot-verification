@@ -11,9 +11,15 @@ import json
 app = Flask(__name__)
 CORS(app, resources={
     r"/upload": {
-        "origins": ["http://localhost:3000", "http://localhost:8080", "http://127.0.0.1:8080"],  # Added 127.0.0.1
+        "origins": [
+            "http://localhost:3000",
+            "http://localhost:8080", 
+            "http://127.0.0.1:8080",
+            "https://doronziv.github.io"  # Add your GitHub Pages domain
+        ],
         "methods": ["POST"],
-        "allow_headers": ["Content-Type"]
+        "allow_headers": ["Content-Type", "Accept"],
+        "supports_credentials": True
     }
 })
 app.secret_key = os.urandom(24)  # Required for session management
