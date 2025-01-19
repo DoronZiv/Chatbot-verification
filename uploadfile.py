@@ -9,19 +9,7 @@ import io
 import json
 
 app = Flask(__name__)
-CORS(app, resources={
-    r"/upload": {
-        "origins": [
-            "http://localhost:3000",
-            "http://localhost:8080", 
-            "http://127.0.0.1:8080",
-            "https://doronziv.github.io"  # Add your GitHub Pages domain
-        ],
-        "methods": ["POST"],
-        "allow_headers": ["Content-Type", "Accept"],
-        "supports_credentials": True
-    }
-})
+CORS(app)  # Enable CORS for all routes
 app.secret_key = os.urandom(24)  # Required for session management
 
 # Configure Google OAuth2
@@ -138,8 +126,4 @@ def get_credentials():
 
 if __name__ == '__main__':
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # For development only
-    try:
-        app.run(port=8080, debug=True)
-    except OSError:
-        print("Port 8080 is in use, trying port 5000...")
-        app.run(port=5000, debug=True)
+    app.run(port=8080, debug=True)  # Changed port to 8080 to match OAuth config
