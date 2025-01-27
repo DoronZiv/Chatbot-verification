@@ -28,7 +28,15 @@
                         ImageUploadExtension,
                       ],
                     },
+                    autoOpen: true
                 });
+                
+                // Add a small delay before trying to open the chat
+                setTimeout(() => {
+                    if (window.voiceflow && window.voiceflow.chat) {
+                        window.voiceflow.chat.open();
+                    }
+                }, 1000);
             };
             v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; 
             v.type = "text/javascript"; 
