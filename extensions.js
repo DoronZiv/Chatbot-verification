@@ -1,5 +1,5 @@
 export const ImageUploadExtension = {
-    name: 'ImageUpload',
+    name: 'Image_Upload',
     type: 'response',
     match: ({ trace }) =>
       trace.type === 'ext_image_upload' || trace.payload.name === 'ext_image_upload',
