@@ -14,7 +14,7 @@
 
     <!-- Load the extensions file first -->
     <script type="module">
-        import { ImageUploadExtension } from './extensions.js';
+        import { ext_image_upload } from './extensions.js';
 
         (function(d, t) {
             var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
@@ -25,7 +25,7 @@
                     versionID: 'production',
                     assistant: {
                       extensions: [
-                        ImageUploadExtension,
+                        ext_image_upload,
                       ],
                     },
                     autoOpen: true
