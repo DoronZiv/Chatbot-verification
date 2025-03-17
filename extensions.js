@@ -2,7 +2,7 @@ export const ImageUploadExtension = {
     name: 'ext_Image_Upload',
     type: 'response',
     match: ({ trace }) =>
-      trace.type === 'ext_image_upload' || trace.payload.name === 'ext_image_upload',
+      trace.type === 'ext_image_upload' || trace.payload?.name === 'ext_image_upload',
     render: ({ trace, element }) => {
       const fileUploadContainer = document.createElement('div')
       fileUploadContainer.innerHTML = `
