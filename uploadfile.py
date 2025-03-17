@@ -9,7 +9,9 @@ import io
 import json
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app,
+    supports_credentials=True,  # Enable credentials mode
+    resources={r"/*": {"origins": ["https://doronziv.github.io", "http://localhost:3000"]}})  # Allow multiple origins
 app.secret_key = os.urandom(24)  # Required for session management
 
 # Configure Google OAuth2
@@ -93,36 +95,51 @@ def upload_file():
         # Generate direct view URL
         view_url = f"https://drive.google.com/uc?id={file.get('id')}"
 
-        return jsonify({
+        return create_success_response({
             'url': view_url,
             'name': file.filename,
             'type': file.content_type
         })
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return create_error_response(str(e), 500)
 
 def get_credentials():
     """Gets valid credentials from storage or initiates OAuth2 flow."""
     if os.path.exists('token.json'):
         try:
             return Credentials.from_authorized_user_file('token.json', SCOPES)
-        except Exception:
-            # If token is invalid, remove it and re-authenticate
-            os.remove('token.json')
-    
+        except Exception as e:
+            print(f"Invalid token.json: {e}")
+            os.remove('token.json')  # Remove invalid token and reauthenticate
+
+    # Initialize OAuth flow
     flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
-    flow.redirect_uri = 'http://localhost:8080'
-    
-    # Store the state in the session for later validation
+    flow.redirect_uri = 'http://localhost:8080/oauth2callback'
+
+    # Generate authorization URL
     authorization_url, state = flow.authorization_url(
         access_type='offline',
         include_granted_scopes='true'
     )
     session['state'] = state
-    
-    # Redirect user to authorization URL
+
+    print(f"Please visit this URL to authorize the application: {authorization_url}")
     return redirect(authorization_url)
+
+def create_error_response(message, status_code):
+    """Create an error response with proper CORS headers."""
+    response = make_response(jsonify({'error': message}), status_code)
+    response.headers.add("Access-Control-Allow-Origin", "https://doronziv.github.io")
+    response.headers.add("Access-Control-Allow-Credentials", "true")
+    return response
+
+def create_success_response(data):
+    """Create a success response with proper CORS headers."""
+    response = make_response(jsonify(data), 200)
+    response.headers.add("Access-Control-Allow-Origin", "https://doronziv.github.io")
+    response.headers.add("Access-Control-Allow-Credentials", "true")
+    return response
 
 if __name__ == '__main__':
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # For development only
