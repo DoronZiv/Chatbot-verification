@@ -1,8 +1,8 @@
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import Flow
+from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from googleapiclient.http import MediaIoBaseUpload
-from flask import Flask, request, jsonify, redirect, session
+from googleapiclient.http import MediaFileUpload, MediaIoBaseUpload
+from flask import Flask, request, jsonify, redirect, session, make_response
 from flask_cors import CORS
 import os
 import io
@@ -18,26 +18,24 @@ app.secret_key = os.urandom(24)  # Required for session management
 CLIENT_SECRETS_FILE = "client_secrets.json"
 SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
-@app.route('/oauth2callback')
-def oauth2callback():
-    """Handle the OAuth 2.0 callback from Google."""
-    flow = Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE,
-        scopes=SCOPES,
-        state=session['state']
-    )
-    flow.redirect_uri = 'http://localhost:8080'
+def get_credentials():
+    """Gets valid credentials from storage or initiates OAuth2 flow."""
+    if os.path.exists('credentials.json'):
+        try:
+            return Credentials.from_authorized_user_file('credentials.json', SCOPES)
+        except Exception as e:
+            print(f"Invalid credentials.json: {e}")
+            os.remove('credentials.json')  # Remove invalid token and reauthenticate
 
-    # Get the authorization code from the callback
-    authorization_response = request.url
-    flow.fetch_token(authorization_response=authorization_response)
-
-    # Store credentials
-    credentials = flow.credentials
+    # Initialize OAuth flow using InstalledAppFlow
+    flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
+    creds = flow.run_local_server(port=8080)
+    
+    # Save credentials for future use
     with open('token.json', 'w') as token:
-        token.write(credentials.to_json())
-
-    return 'Authorization successful! You can close this window.'
+        token.write(creds.to_json())
+    
+    return creds
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -54,7 +52,7 @@ def upload_file():
 
         # Validate file size (5MB limit)
         if len(file.read()) > 5 * 1024 * 1024:  # 5MB in bytes
-            return jsonify({'error': 'File too large'}), 400
+            return jsonify({'error': 'File too large, 5MB limit'}), 400
         file.seek(0)  # Reset file pointer after reading
 
         # Initialize Google Drive service
@@ -103,29 +101,6 @@ def upload_file():
 
     except Exception as e:
         return create_error_response(str(e), 500)
-
-def get_credentials():
-    """Gets valid credentials from storage or initiates OAuth2 flow."""
-    if os.path.exists('token.json'):
-        try:
-            return Credentials.from_authorized_user_file('token.json', SCOPES)
-        except Exception as e:
-            print(f"Invalid token.json: {e}")
-            os.remove('token.json')  # Remove invalid token and reauthenticate
-
-    # Initialize OAuth flow
-    flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
-    flow.redirect_uri = 'http://localhost:8080/oauth2callback'
-
-    # Generate authorization URL
-    authorization_url, state = flow.authorization_url(
-        access_type='offline',
-        include_granted_scopes='true'
-    )
-    session['state'] = state
-
-    print(f"Please visit this URL to authorize the application: {authorization_url}")
-    return redirect(authorization_url)
 
 def create_error_response(message, status_code):
     """Create an error response with proper CORS headers."""
