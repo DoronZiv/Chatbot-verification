@@ -35,7 +35,7 @@ export const ImageUploadExtension = {
         data.append('file', file)
 
         // Send file to Python backend
-        fetch('http://localhost:8080/uploadfile', {
+        fetch('https://doronziv.github.io/Chatbot-verification/uploadfile', {
           method: 'POST',
           body: data,
           headers: {
