@@ -39,9 +39,7 @@ def get_credentials():
         token.write(creds.to_json())
     
     return creds
-        token.write(creds.to_json())
-    
-    return creds
+        
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
