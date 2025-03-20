@@ -1,6 +1,9 @@
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
+from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload, MediaIoBaseUpload
+from flask import Flask, request, jsonify, redirect, session, make_response
 from googleapiclient.http import MediaFileUpload, MediaIoBaseUpload
 from flask import Flask, request, jsonify, redirect, session, make_response
 from flask_cors import CORS
@@ -36,6 +39,9 @@ def get_credentials():
         token.write(creds.to_json())
     
     return creds
+        token.write(creds.to_json())
+    
+    return creds
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -52,6 +58,7 @@ def upload_file():
 
         # Validate file size (5MB limit)
         if len(file.read()) > 5 * 1024 * 1024:  # 5MB in bytes
+            return jsonify({'error': 'File too large, 5MB limit'}), 400
             return jsonify({'error': 'File too large, 5MB limit'}), 400
         file.seek(0)  # Reset file pointer after reading
 
