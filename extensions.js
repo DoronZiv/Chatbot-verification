@@ -34,7 +34,6 @@ export const ImageUploadExtension = {
         var data = new FormData()
         data.append('file', file)
 
-        // Send file to Python backend
         fetch('http://localhost:8080/upload', {
           method: 'POST',
           body: data,
