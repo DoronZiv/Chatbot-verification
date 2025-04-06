@@ -7,6 +7,8 @@ from flask_cors import CORS
 
 # Load the environment variables from the .env file
 load_dotenv()
+print("AWS_ACCESS_KEY_ID:", os.environ.get("AWS_ACCESS_KEY_ID"))
+print("S3_BUCKET_NAME:", os.environ.get("S3_BUCKET_NAME"))
 
 # Now your environment variables are accessible via os.environ.get()
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
@@ -27,7 +29,7 @@ s3_client = boto3.client(
     region_name=S3_REGION
 )
 
-def upload_file_to_s3(file, bucket_name, acl="public-read"):
+def upload_file_to_s3(file, S3_BUCKET_NAME, acl="public-read"):
     """
     Uploads a file object to S3 using boto3.
     Returns the public URL of the uploaded file.
@@ -42,7 +44,7 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
         # Use upload_fileobj to stream the file to S3
         s3_client.upload_fileobj(
             file,
-            bucket_name,
+            S3_BUCKET_NAME,
             filename,
             ExtraArgs={
                 "ACL": acl,
@@ -56,7 +58,7 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
         return None
 
     # Construct the public URL (adjust if your bucket policy is different)
-    return f"https://{bucket_name}.s3.{S3_REGION}.amazonaws.com/{filename}"
+    return f"https://{S3_BUCKET_NAME}.s3.{S3_REGION}.amazonaws.com/{filename}"
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
