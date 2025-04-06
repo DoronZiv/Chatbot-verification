@@ -35,7 +35,9 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
     # Provide a default name if file.filename is None or empty
     original_filename = file.filename or "uploaded_file"
     filename = secure_filename(original_filename)
-    
+    print("Uploading file:", filename)
+    print("File content type:", file.content_type)
+
     try:
         # Use upload_fileobj to stream the file to S3
         s3_client.upload_fileobj(
@@ -48,7 +50,9 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
             }
         )
     except Exception as e:
-        print("An error occurred while uploading to S3:", e)
+        import traceback
+        print("An error occurred while uploading to S3:")
+        traceback.print_exc()  # This will print the full traceback to your console
         return None
 
     # Construct the public URL (adjust if your bucket policy is different)
