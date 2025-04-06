@@ -14,9 +14,9 @@ AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
 S3_REGION = os.environ.get("S3_REGION", "us-east-1")
 
-
 app = Flask(__name__)
-CORS(app)  # Enable CORS so requests from your chatbot are accepted
+# Enable CORS and allow credentials
+CORS(app, supports_credentials=True)
 app.secret_key = "your_secret_key"  # Replace with a random secret for production
 
 # Initialize the boto3 S3 client with your access keys
