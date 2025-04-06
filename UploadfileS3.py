@@ -32,8 +32,9 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
     Uploads a file object to S3 using boto3.
     Returns the public URL of the uploaded file.
     """
-    # Secure the filename to prevent directory traversal attacks
-    filename = secure_filename(file.filename)
+    # Provide a default name if file.filename is None or empty
+    original_filename = file.filename or "uploaded_file"
+    filename = secure_filename(original_filename)
     
     try:
         # Use upload_fileobj to stream the file to S3
