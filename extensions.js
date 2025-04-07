@@ -37,7 +37,7 @@ export const ImageUploadExtension = {
   
         // Show appropriate loading indicator based on file type
         if (file.type.startsWith('image/')) {
-          fileUploadContainer.innerHTML = `<img src="https://cdn.voiceflow.com/voiceflow-sdk.min.js/share/upload/upload.gif" alt="Upload" width="50" height="50">`
+          fileUploadContainer.innerHTML = `<img src="https://doronziv.github.io/Chatbot-verification/extensions.js/share/upload/upload.gif" alt="Upload" width="50" height="50">`
         } else {
           fileUploadContainer.innerHTML = `<div class="my-file-upload">Uploading text file...</div>`
         }
