@@ -31,30 +31,47 @@ export const ImageUploadExtension = {
   
         fileUploadContainer.innerHTML = `<img src="https://s3.amazonaws.com/com.voiceflow.studio/share/upload/upload.gif" alt="Upload" width="50" height="50">`
   
-        var data = new FormData()
-        data.append('file', file)
-
-        fetch('http://localhost:8080/upload', {
-          method: 'POST',
-          body: data,
-          headers: {
-            'Accept': 'application/json'
-          },
-          mode: 'cors',
-          credentials: 'include'
-        })
+      // Get file details
+      let fileName = file.name;
+      const contentType = file.type;  // e.g., "image/jpeg"
+      // Optionally, modify fileName to ensure uniqueness:
+      fileName = `${Date.now()}-${fileName}`;
+  
+      // Replace with your actual API Gateway endpoint URL
+      const presignedUrlEndpoint = 'https://dbrkmoo6l1.execute-api.eu-north-1.amazonaws.com/production';
+  
+      // Construct URL with query parameters
+      const urlWithParams = `${presignedUrlEndpoint}?fileName=${encodeURIComponent(fileName)}&contentType=${encodeURIComponent(contentType)}`;
+  
+      // Step 1: Request the pre-signed URL
+      fetch(urlWithParams, { method: 'GET' })
         .then(response => response.json())
-        .then(result => {
-          console.log('Upload successful:', result);
-          // Update UI with uploaded image
-          fileUploadContainer.innerHTML = `<img src="${result.url}" alt="Uploaded image" style="max-width: 100%; max-height: 300px;">`;
+        .then(data => {
+          console.log('Received pre-signed URL:', data.url);
+          // Step 2: Use the pre-signed URL to upload the file via PUT
+          return fetch(data.url, {
+            method: 'PUT',
+            headers: { 'Content-Type': contentType },
+            body: file
+          });
+        })
+        .then(uploadResponse => {
+          if (uploadResponse.ok) {
+            console.log('File successfully uploaded to S3!');
+            // Optionally, update the UI with the final image URL:
+            // e.g., publicUrl = `https://YOUR_BUCKET_NAME.s3.YOUR_REGION.amazonaws.com/${fileName}`;
+            fileUploadContainer.innerHTML = `<img src="https://dozi-incidentreport-test.s3.eu-north-1.amazonaws.com/${fileName}" alt="Uploaded image" style="max-width: 100%; max-height: 300px;">`;
+          } else {
+            console.error('Upload failed:', uploadResponse.statusText);
+            fileUploadContainer.innerHTML = `<div class="my-file-upload">Upload failed. Please try again.</div>`;
+          }
         })
         .catch(error => {
-          console.error('Upload failed:', error);
+          console.error('Error during upload:', error);
           fileUploadContainer.innerHTML = `<div class="my-file-upload">Upload failed. Please try again.</div>`;
         });
-      })
+    });
   
-      element.appendChild(fileUploadContainer)
-    },
-  }
+    element.appendChild(fileUploadContainer);
+  },
+};
