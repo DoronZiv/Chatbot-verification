@@ -28,12 +28,23 @@ export const ImageUploadExtension = {
       fileInput.addEventListener('change', function () {
         const file = fileInput.files[0]
         console.log('File selected:', file)
+        
+        // Validate that the file is either an image or text
+        if (!file.type.startsWith('image/') && !file.type.startsWith('text/')) {
+          fileUploadContainer.innerHTML = `<div class="my-file-upload" style="color: red;">Please select an image or text file only</div>`
+          return
+        }
   
-        fileUploadContainer.innerHTML = `<img src="https://s3.amazonaws.com/com.voiceflow.studio/share/upload/upload.gif" alt="Upload" width="50" height="50">`
+        // Show appropriate loading indicator based on file type
+        if (file.type.startsWith('image/')) {
+          fileUploadContainer.innerHTML = `<img src="https://s3.amazonaws.com/com.voiceflow.studio/share/upload/upload.gif" alt="Upload" width="50" height="50">`
+        } else {
+          fileUploadContainer.innerHTML = `<div class="my-file-upload">Uploading text file...</div>`
+        }
   
       // Get file details
       let fileName = file.name;
-      const contentType = file.type;  // e.g., "image/jpeg"
+      const contentType = file.type;  // This will be either image/* or text/*
       // Optionally, modify fileName to ensure uniqueness:
       fileName = `${Date.now()}-${fileName}`;
   
