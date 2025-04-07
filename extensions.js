@@ -58,8 +58,8 @@ export const ImageUploadExtension = {
       fetch(urlWithParams, { method: 'GET' })
         .then(response => response.json())
         .then(data => {
-          console.log('Received pre-signed URL:', data.url);
-          // Step 2: Use the pre-signed URL to upload the file via PUT
+          console.log('Received presigned URL:', data.url);
+          // Step 2: Use the presigned URL to upload the file via PUT
           return fetch(data.url, {
             method: 'PUT',
             headers: { 'ContentType': contentType },
