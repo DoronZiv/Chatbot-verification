@@ -52,7 +52,7 @@ export const ImageUploadExtension = {
       const presignedUrlEndpoint = 'https://dbrkmoo6l1.execute-api.eu-north-1.amazonaws.com/production';
   
       // Construct URL with query parameters
-      const urlWithParams = `${presignedUrlEndpoint}?fileName=${encodeURIComponent(fileName)}&content-Type=${encodeURIComponent(contentType)}`;
+      const urlWithParams = `${presignedUrlEndpoint}?fileName=${encodeURIComponent(fileName)}&contentType=${encodeURIComponent(contentType)}`;
   
       // Step 1: Request the pre-signed URL
       fetch(urlWithParams, { method: 'GET' })
@@ -62,7 +62,7 @@ export const ImageUploadExtension = {
           // Step 2: Use the presigned URL to upload the file via PUT
           return fetch( data.url, {
             method: 'PUT',
-            headers: { 'Content-Type': contentType },
+            headers: { 'ContentType': contentType },
             body: file
           });
         })
