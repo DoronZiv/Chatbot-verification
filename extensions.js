@@ -62,7 +62,7 @@ export const ImageUploadExtension = {
           // Step 2: Use the presigned URL to upload the file via PUT
           return fetch( data.url, {
             method: 'PUT',
-            headers: { 'ContentType': contentType },
+            headers: { 'Content-Type': contentType },
             body: file
           });
         })
