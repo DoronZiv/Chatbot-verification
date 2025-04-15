@@ -1,14 +1,8 @@
-// Import AWS SDK v3 modules from CDN
-const { S3Client, PutObjectCommand } = window.awsSdkClientS3;
-const { CognitoIdentityClient } = window.awsSdkClientCognitoIdentity;
-const { fromCognitoIdentityPool } = window.awsSdkCredentialProviderCognitoIdentity;
-
 // Configure AWS with Cognito
-const s3Client = new S3Client({
+const s3 = new AWS.S3({
     region: "eu-north-1",
-    credentials: fromCognitoIdentityPool({
-        client: new CognitoIdentityClient({ region: "eu-north-1" }),
-        identityPoolId: "eu-north-1:6b7fe3b6-ecfb-49bd-abfd-b3ec9ca872e3"
+    credentials: new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: "eu-north-1:6b7fe3b6-ecfb-49bd-abfd-b3ec9ca872e3"
     })
 });
 
@@ -61,15 +55,15 @@ export const ImageUploadExtension = {
           const fileName = `${Date.now()}-${file.name}`;
           
           // Upload directly to S3 using Cognito credentials
-          const command = new PutObjectCommand({
+          const params = {
             Bucket: "dozi-incidentreport-test",
             Key: fileName,
             Body: file,
             ContentType: file.type,
             ACL: 'public-read'
-          });
+          };
 
-          await s3Client.send(command);
+          await s3.upload(params).promise();
           
           // Construct the public URL
           const fileUrl = `https://dozi-incidentreport-test.s3.eu-north-1.amazonaws.com/${fileName}`;
