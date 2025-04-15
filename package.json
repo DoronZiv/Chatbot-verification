@@ -1,0 +1,13 @@
+{
+  "name": "s3-uploader",
+  "version": "1.0.0",
+  "description": "S3 file uploader using AWS SDK v3",
+  "main": "extensions.js",
+  "type": "module",
+  "scripts": {
+    "start": "node extensions.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.425.0"
+  }
+} 
