@@ -4,6 +4,7 @@ import boto3
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from flask_cors import CORS
+from werkzeug.datastructures import FileStorage
 
 # Load the environment variables from the .env file
 load_dotenv()
@@ -21,7 +22,7 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True)
 app.secret_key = "your_secret_key"  # Replace with a random secret for production
 
-# Initialize the boto3 S3 client with your access keys
+# Initialize the boto3 S3 client
 s3_client = boto3.client(
     "s3",
     aws_access_key_id=AWS_ACCESS_KEY_ID,
@@ -29,58 +30,58 @@ s3_client = boto3.client(
     region_name=S3_REGION
 )
 
-def upload_file_to_s3(file, S3_BUCKET_NAME, acl="public-read"):
+def upload_file_to_s3(file, bucket_name, filename, content_type):
     """
     Uploads a file object to S3 using boto3.
     Returns the public URL of the uploaded file.
     """
-    # Provide a default name if file.filename is None or empty
-    original_filename = file.filename or "uploaded_file"
-    filename = secure_filename(original_filename)
-    print("Uploading file:", filename)
-    print("File content type:", file.content_type)
-
     try:
-        # Use upload_fileobj to stream the file to S3
+        # Upload the file to S3
         s3_client.upload_fileobj(
             file,
-            S3_BUCKET_NAME,
+            bucket_name,
             filename,
             ExtraArgs={
-                "ContentType": file.content_type
+                "ContentType": content_type,
+                "ACL": "public-read"
             }
         )
+        
+        # Construct the public URL
+        file_url = f"https://{bucket_name}.s3.{S3_REGION}.amazonaws.com/{filename}"
+        return file_url
     except Exception as e:
-        import traceback
-        print("An error occurred while uploading to S3:")
-        traceback.print_exc()  # This will print the full traceback to your console
+        print(f"Error uploading file to S3: {str(e)}")
         return None
-
-    # Construct the public URL (adjust if your bucket policy is different)
-    return f"https://{S3_BUCKET_NAME}.s3.{S3_REGION}.amazonaws.com/{filename}"
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
-    # Check for the file in the request
-    if "file" not in request.files:
-        flash("No file part in the request.")
-        return jsonify({"error": "No file part in the request"}), 400
-    
-    file = request.files["file"]
-    
-    # If no file is selected
-    if file.filename == "":
-        flash("No file selected.")
-        return jsonify({"error": "No file selected"}), 400
-
-    # If a file is selected, attempt the upload to S3
-    file_url = upload_file_to_s3(file, S3_BUCKET_NAME)
-    if file_url:
-        flash("File uploaded successfully!")
-        return jsonify({"url": file_url})
-    else:
-        flash("File upload failed!")
-        return jsonify({"error": "File upload failed"}), 500
+    try:
+        # Check if file is present in the request
+        if 'file' not in request.files:
+            return jsonify({"error": "No file part"}), 400
+            
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+            
+        # Get additional parameters
+        filename = request.form.get('fileName', secure_filename(file.filename))
+        content_type = request.form.get('contentType', 'application/octet-stream')
+        
+        # Upload the file to S3
+        file_url = upload_file_to_s3(file, S3_BUCKET_NAME, filename, content_type)
+        
+        if file_url:
+            return jsonify({"url": file_url})
+        else:
+            return jsonify({"error": "Failed to upload file"}), 500
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080)
+    app.run(debug=True)
+
+
+   

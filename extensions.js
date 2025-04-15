@@ -1,3 +1,6 @@
+// Import the S3 upload function
+const { uploadFileToS3 } = require('./uploadFileS3');
+
 export const ImageUploadExtension = {
     name: 'ImageUpload',
     type: 'response',
@@ -25,7 +28,7 @@ export const ImageUploadExtension = {
         fileInput.click()
       })
   
-      fileInput.addEventListener('change', function () {
+      fileInput.addEventListener('change', async function () {
         const file = fileInput.files[0]
         console.log('File selected:', file)
 
@@ -41,48 +44,42 @@ export const ImageUploadExtension = {
         } else {
           fileUploadContainer.innerHTML = `<div class="my-file-upload">Uploading text file...</div>`
         }
-  
-      // Get file details
-      let fileName = file.name;
-      const contentType = file.type;  // This will be either image/* or text/*
-      // Optionally, modify fileName to ensure uniqueness:
-      fileName = `${Date.now()}-${fileName}`;
-  
-      // Replace with your actual API Gateway endpoint URL
-      const presignedUrlEndpoint = 'https://dbrkmoo6l1.execute-api.eu-north-1.amazonaws.com/production';
-  
-      // Construct URL with query parameters
-      const urlWithParams = `${presignedUrlEndpoint}?fileName=${encodeURIComponent(fileName)}&contentType=${encodeURIComponent(contentType)}`;
-  
-      // Step 1: Request the pre-signed URL
-      fetch(urlWithParams, { method: 'GET' })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Received presigned URL:', data.url);
-          // Step 2: Use the presigned URL to upload the file via PUT
-          return fetch( data.url, {
-            method: 'PUT',
-            headers: { 'Content-Type': contentType },
-            body: file
+
+        try {
+          // Create FormData for the file upload
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('fileName', `${Date.now()}-${file.name}`);
+          formData.append('contentType', file.type);
+
+          // Send the file directly to your backend for S3 upload
+          const response = await fetch('https://dbrkmoo6l1.execute-api.eu-north-1.amazonaws.com/production/upload', {
+            method: 'POST',
+            body: formData
           });
-        })
-        .then(uploadResponse => {
-          if (uploadResponse.ok) {
-            console.log('File successfully uploaded to S3!');
-            // Optionally, update the UI with the final image URL:
-            // e.g., publicUrl = `https://YOUR_BUCKET_NAME.s3.YOUR_REGION.amazonaws.com/${fileName}`;
-            fileUploadContainer.innerHTML = `<img src="https://dozi-incidentreport-test.s3.eu-north-1.amazonaws.com/${fileName}" alt="Uploaded image" style="max-width: 100%; max-height: 300px;">`;
-          } else {
-            console.error('Upload failed:', uploadResponse.statusText);
-            fileUploadContainer.innerHTML = `<div class="my-file-upload">Upload failed. Please try again.</div>`;
+
+          if (!response.ok) {
+            throw new Error('Upload failed');
           }
-        })
-        .catch(error => {
+
+          const result = await response.json();
+          
+          if (result.url) {
+            // Display the uploaded file
+            if (file.type.startsWith('image/')) {
+              fileUploadContainer.innerHTML = `<img src="${result.url}" alt="Uploaded image" style="max-width: 100%; max-height: 300px;">`;
+            } else {
+              fileUploadContainer.innerHTML = `<div class="my-file-upload">File uploaded successfully! <a href="${result.url}" target="_blank">View file</a></div>`;
+            }
+          } else {
+            throw new Error('Upload failed');
+          }
+        } catch (error) {
           console.error('Error during upload:', error);
           fileUploadContainer.innerHTML = `<div class="my-file-upload">Upload failed. Please try again.</div>`;
-        });
-    });
+        }
+      })
   
-    element.appendChild(fileUploadContainer);
-  },
-};
+      element.appendChild(fileUploadContainer)
+    }
+}
