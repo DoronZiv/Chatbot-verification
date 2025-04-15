@@ -1,9 +1,20 @@
+// Initialize AWS SDK
+AWS.config.update({
+    region: "eu-north-1"
+});
+
 // Configure AWS with Cognito
 const s3 = new AWS.S3({
-    region: "eu-north-1",
     credentials: new AWS.CognitoIdentityCredentials({
         IdentityPoolId: "eu-north-1:6b7fe3b6-ecfb-49bd-abfd-b3ec9ca872e3"
     })
+});
+
+// Ensure credentials are loaded
+s3.config.credentials.get(function(err) {
+    if (err) {
+        console.error('Error loading credentials:', err);
+    }
 });
 
 export const ImageUploadExtension = {
