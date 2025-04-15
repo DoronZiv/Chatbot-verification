@@ -1,5 +1,14 @@
-// Import the S3 upload function
-const { uploadFileToS3 } = require('./uploadFileS3');
+// Import AWS SDK v3
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+
+// Configure AWS
+const s3Client = new S3Client({
+    region: "eu-north-1",
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    }
+});
 
 export const ImageUploadExtension = {
     name: 'ImageUpload',
@@ -46,33 +55,29 @@ export const ImageUploadExtension = {
         }
 
         try {
-          // Create FormData for the file upload
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('fileName', `${Date.now()}-${file.name}`);
-          formData.append('contentType', file.type);
-
-          // Send the file directly to your backend for S3 upload
-          const response = await fetch('https://dbrkmoo6l1.execute-api.eu-north-1.amazonaws.com/production/upload', {
-            method: 'POST',
-            body: formData
+          // Create a unique filename
+          const fileName = `${Date.now()}-${file.name}`;
+          
+          // Create the S3 upload command
+          const command = new PutObjectCommand({
+            Bucket: process.env.S3_BUCKET_NAME,
+            Key: fileName,
+            Body: file,
+            ContentType: file.type,
+            ACL: 'public-read'
           });
 
-          if (!response.ok) {
-            throw new Error('Upload failed');
-          }
-
-          const result = await response.json();
+          // Upload directly to S3
+          await s3Client.send(command);
           
-          if (result.url) {
-            // Display the uploaded file
-            if (file.type.startsWith('image/')) {
-              fileUploadContainer.innerHTML = `<img src="${result.url}" alt="Uploaded image" style="max-width: 100%; max-height: 300px;">`;
-            } else {
-              fileUploadContainer.innerHTML = `<div class="my-file-upload">File uploaded successfully! <a href="${result.url}" target="_blank">View file</a></div>`;
-            }
+          // Construct the public URL
+          const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.eu-north-1.amazonaws.com/${fileName}`;
+          
+          // Display the uploaded file
+          if (file.type.startsWith('image/')) {
+            fileUploadContainer.innerHTML = `<img src="${fileUrl}" alt="Uploaded image" style="max-width: 100%; max-height: 300px;">`;
           } else {
-            throw new Error('Upload failed');
+            fileUploadContainer.innerHTML = `<div class="my-file-upload">File uploaded successfully! <a href="${fileUrl}" target="_blank">View file</a></div>`;
           }
         } catch (error) {
           console.error('Error during upload:', error);
@@ -82,4 +87,4 @@ export const ImageUploadExtension = {
   
       element.appendChild(fileUploadContainer)
     }
-}
+}  
