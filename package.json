@@ -1,13 +1,15 @@
 {
   "name": "s3-uploader",
   "version": "1.0.0",
-  "description": "S3 file uploader using AWS SDK v3",
+  "description": "S3 file uploader using AWS SDK v3 with Cognito",
   "main": "extensions.js",
   "type": "module",
   "scripts": {
     "start": "node extensions.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.787.0"
+    "@aws-sdk/client-s3": "^3.425.0",
+    "@aws-sdk/client-cognito-identity": "^3.425.0",
+    "@aws-sdk/credential-provider-cognito-identity": "^3.425.0"
   }
 }
