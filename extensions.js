@@ -1,5 +1,7 @@
 // Import dotenv
 import 'dotenv/config';
+// Import AWS
+import AWS from 'aws-sdk';
 
 // Debug AWS object
 console.log('AWS Object:', AWS);
