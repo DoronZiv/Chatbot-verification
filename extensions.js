@@ -1,18 +1,29 @@
+// Debug AWS object
+console.log('AWS Object:', AWS);
+console.log('AWS.CognitoIdentityCredentials:', AWS.CognitoIdentityCredentials);
+
 // Initialize AWS SDK
 AWS.config.update({
-    region: "eu-north-1",
+    region: "eu-north-1"
+});
+
+// Configure AWS with Cognito
+const s3 = new AWS.S3({
     credentials: new AWS.CognitoIdentityCredentials({
         IdentityPoolId: "eu-north-1:6b7fe3b6-ecfb-49bd-abfd-b3ec9ca872e3"
     })
 });
 
-// Create S3 client
-const s3 = new AWS.S3();
+// Debug credentials
+console.log('S3 Client:', s3);
+console.log('Credentials:', s3.config.credentials);
 
 // Ensure credentials are loaded
-AWS.config.credentials.get(function(err) {
+s3.config.credentials.get(function(err) {
     if (err) {
         console.error('Error loading credentials:', err);
+    } else {
+        console.log('Credentials loaded successfully');
     }
 });
 
@@ -73,6 +84,7 @@ export const ImageUploadExtension = {
             ACL: 'public-read'
           };
 
+          console.log('Uploading with params:', params);
           await s3.upload(params).promise();
           
           // Construct the public URL
