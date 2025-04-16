@@ -1,15 +1,13 @@
 {
-  "name": "s3-uploader",
+  "name": "voiceflow-image-upload",
   "version": "1.0.0",
-  "description": "S3 file uploader using AWS SDK v3 with Cognito",
+  "description": "Voiceflow extension for direct S3 uploads using AWS SDK v2",
   "main": "extensions.js",
   "type": "module",
   "scripts": {
     "start": "node extensions.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.425.0",
-    "@aws-sdk/client-cognito-identity": "^3.425.0",
-    "@aws-sdk/credential-provider-cognito-identity": "^3.425.0"
+    "aws-sdk": "^2.1499.0"
   }
 }
