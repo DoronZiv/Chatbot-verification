@@ -1,16 +1,19 @@
+// Import dotenv
+import 'dotenv/config';
+
 // Debug AWS object
 console.log('AWS Object:', AWS);
 console.log('AWS.CognitoIdentityCredentials:', AWS.CognitoIdentityCredentials);
 
 // Initialize AWS SDK
 AWS.config.update({
-    region: "eu-north-1"
+    region: process.env.AWS_REGION || "eu-north-1"
 });
 
 // Configure AWS with Cognito
 const s3 = new AWS.S3({
     credentials: new AWS.CognitoIdentityCredentials({
-        IdentityPoolId: "eu-north-1:6b7fe3b6-ecfb-49bd-abfd-b3ec9ca872e3"
+        IdentityPoolId: process.env.AWS_COGNITO_IDENTITY_POOL_ID || "eu-north-1:6b7fe3b6-ecfb-49bd-abfd-b3ec9ca872e3"
     })
 });
 
@@ -77,7 +80,7 @@ export const ImageUploadExtension = {
           
           // Upload directly to S3 using Cognito credentials
           const params = {
-            Bucket: "dozi-incidentreport-test",
+            Bucket: process.env.AWS_S3_BUCKET || "dozi-incidentreport-test",
             Key: fileName,
             Body: file,
             ContentType: file.type,
@@ -88,7 +91,7 @@ export const ImageUploadExtension = {
           await s3.upload(params).promise();
           
           // Construct the public URL
-          const fileUrl = `https://dozi-incidentreport-test.s3.eu-north-1.amazonaws.com/${fileName}`;
+          const fileUrl = `https://${process.env.AWS_S3_BUCKET || "dozi-incidentreport-test"}.s3.${process.env.AWS_REGION || "eu-north-1"}.amazonaws.com/${fileName}`;
           
           // Display the uploaded file
           if (file.type.startsWith('image/')) {
