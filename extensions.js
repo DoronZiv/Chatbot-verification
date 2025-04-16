@@ -1,5 +1,3 @@
-// Import dotenv
-import 'dotenv/config';
 // Import AWS
 import AWS from 'aws-sdk';
 
