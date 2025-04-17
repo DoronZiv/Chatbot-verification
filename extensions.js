@@ -1,31 +1,21 @@
 // Debug AWS object
 console.log('AWS Object:', AWS);
-console.log('AWS.CognitoIdentityCredentials:', AWS.CognitoIdentityCredentials);
 
 // Initialize AWS SDK
 AWS.config.update({
-    region: "eu-north-1"
-});
-
-// Configure AWS with Cognito
-const s3 = new AWS.S3({
-    credentials: new AWS.CognitoIdentityCredentials({
-        IdentityPoolId: "eu-north-1:6b7fe3b6-ecfb-49bd-abfd-b3ec9ca872e3"
+    region: "eu-north-1",
+    credentials: new AWS.Credentials({
+        accessKeyId: "YOUR_ACCESS_KEY_ID",
+        secretAccessKey: "YOUR_SECRET_ACCESS_KEY"
     })
 });
+
+// Create S3 client
+const s3 = new AWS.S3();
 
 // Debug credentials
 console.log('S3 Client:', s3);
 console.log('Credentials:', s3.config.credentials);
-
-// Ensure credentials are loaded
-s3.config.credentials.get(function(err) {
-    if (err) {
-        console.error('Error loading credentials:', err);
-    } else {
-        console.log('Credentials loaded successfully');
-    }
-});
 
 export const ImageUploadExtension = {
     name: 'ImageUpload',
@@ -75,7 +65,7 @@ export const ImageUploadExtension = {
           // Create a unique filename
           const fileName = `${Date.now()}-${file.name}`;
           
-          // Upload directly to S3 using Cognito credentials
+          // Upload directly to S3
           const params = {
             Bucket: "dozi-incidentreport-test",
             Key: fileName,
