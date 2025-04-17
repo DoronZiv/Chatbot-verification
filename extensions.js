@@ -3,19 +3,17 @@ console.log('AWS Object:', AWS);
 
 // Initialize AWS SDK
 AWS.config.update({
-    region: "eu-north-1",
-    credentials: new AWS.Credentials({
-        accessKeyId: "YOUR_ACCESS_KEY_ID",
-        secretAccessKey: "YOUR_SECRET_ACCESS_KEY"
-    })
+    region: "eu-north-1"
 });
 
 // Create S3 client
-const s3 = new AWS.S3();
+const s3 = new AWS.S3({
+    apiVersion: '2006-03-01',
+    params: { Bucket: 'dozi-incidentreport-test' }
+});
 
-// Debug credentials
+// Debug S3 client
 console.log('S3 Client:', s3);
-console.log('Credentials:', s3.config.credentials);
 
 export const ImageUploadExtension = {
     name: 'ImageUpload',
@@ -67,7 +65,6 @@ export const ImageUploadExtension = {
           
           // Upload directly to S3
           const params = {
-            Bucket: "dozi-incidentreport-test",
             Key: fileName,
             Body: file,
             ContentType: file.type,
