@@ -1,6 +1,5 @@
-// Import AWS
-import AWS from 'aws-sdk';
-
+// instead of: import AWS from 'aws-sdk';
+const AWS = window.AWS;
 // Debug AWS object
 console.log('AWS Object:', AWS);
 console.log('AWS.CognitoIdentityCredentials:', AWS.CognitoIdentityCredentials);
