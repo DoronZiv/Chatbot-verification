@@ -2,13 +2,7 @@
 console.log('AWS Object:', AWS);
 
 // Initialize AWS SDK
-AWS.config.update({
-    region: "eu-north-1",
-    credentials: new AWS.CognitoIdentityCredentials({
-        IdentityPoolId: "eu-north-1:6b7fe3b6-ecfb-49bd-abfd-b3ec9ca872e3",
-        RoleArn: "arn:aws:iam::774928064137:role/DOZI-Upload"
-    })
-});
+AWS.config.region = "eu-north-1";
 
 // Create S3 client
 const s3 = new AWS.S3({
@@ -18,15 +12,6 @@ const s3 = new AWS.S3({
 
 // Debug S3 client
 console.log('S3 Client:', s3);
-
-// Ensure credentials are loaded
-AWS.config.credentials.get(function(err) {
-    if (err) {
-        console.error('Error loading credentials:', err);
-    } else {
-        console.log('Credentials loaded successfully');
-    }
-});
 
 export const ImageUploadExtension = {
     name: 'ImageUpload',

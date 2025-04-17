@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.voiceflow.com/voiceflow-sdk.min.js"></script>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1499.0.min.js"></script>
+    <script>
+        // Configure AWS SDK
+        AWS.config.region = 'eu-north-1';
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: 'eu-north-1:6b7fe3b6-ecfb-49bd-abfd-b3ec9ca872e3'
+        });
+    </script>
     <script type="module" src="./extensions.js"></script>
 </head>
 <body>
