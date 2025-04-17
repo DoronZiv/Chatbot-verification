@@ -5,10 +5,16 @@
   "main": "extensions.js",
   "type": "module",
   "scripts": {
+    "build": "parcel build src/index.html -d dist --public-url ./",
     "start": "node extensions.js"
   },
   "dependencies": {
-    "aws-sdk": "^2.1499.0",
     "dotenv": "^16.3.1"
-  }
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.5"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
